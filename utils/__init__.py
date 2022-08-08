@@ -4,8 +4,6 @@ import urllib3
 from retrying import retry
 from faker import Faker
 from loguru import logger
-from requests.exceptions import ConnectionError
-from requests import RequestException
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 __all__ = ['Requests']
@@ -42,16 +40,17 @@ class Requests(object):
         kwargs.setdefault('verify', False)
         kwargs.setdefault('headers', self.headers)
         kwargs.setdefault('allow_redirects', False)
+        kwargs.setdefault('proxies', {'http': None, 'https': None})
         try:
             res = self.session.get(url, **kwargs)
             if res.status_code == 200:
                 res.encoding = 'utf-8'
-                self.log(f"请求成功，请求地址：{url}")
+                self.log(f"get请求成功，请求地址：{url}")
                 return res
             else:
-                self.log(f"请求地址：{url}， 状态码：{res.status_code}")
+                self.log(f"get请求地址：{url}， 状态码：{res.status_code}")
         except Exception as e:
-            self.log(f"请求失败，请求地址：{url}")
+            self.log(f"get请求失败，请求地址：{url}")
             raise e
 
     @retry(stop_max_attempt_number=3, wait_fixed=2000, retry_on_result=lambda x: x is None)
@@ -64,14 +63,15 @@ class Requests(object):
         kwargs.setdefault('verify', False)
         kwargs.setdefault('headers', self.headers)
         kwargs.setdefault('allow_redirects', False)
+        kwargs.setdefault('proxies', {'http': None, 'https': None})
         try:
             res = self.session.post(url, **kwargs)
             if res.status_code == 200:
                 res.encoding = 'utf-8'
-                self.log(f"请求成功，请求地址：{url}")
+                self.log(f"post请求成功，请求地址：{url}")
                 return res
             else:
-                self.log(f"请求地址：{url}， 状态码：{res.status_code}")
+                self.log(f"post请求地址：{url}， 状态码：{res.status_code}")
         except Exception as e:
-            self.log(f"请求失败，请求地址：{url}")
+            self.log(f"post请求失败，请求地址：{url}")
             raise e
